@@ -228,3 +228,21 @@ body {
 
 /* ===== 検索ボックス ===== */
 .search-box { margin-bottom: 12px; }
+
+/* ===== A-03: 作業員詳細 ===== */
+.worker-profile {
+  background: #e3f2fd; padding: 16px; border-radius: 8px; margin-bottom: 16px;
+}
+.profile-name { font-size: 20px; font-weight: bold; color: #1565c0; }
+.profile-meta { font-size: 13px; color: #666; margin-top: 4px; }
+.detail-section { margin-bottom: 16px; }
+.detail-row { font-size: 14px; padding: 4px 0; color: #333; }
+
+/* ===== A-06: アカウント管理 ===== */
+.account-card {
+  border: 1px solid #ddd; border-radius: 8px;
+  padding: 12px; margin-bottom: 10px;
+}
+.account-name { font-weight: bold; font-size: 15px; }
+.account-meta { font-size: 12px; color: #666; margin-top: 4px; }
+

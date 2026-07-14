@@ -238,15 +238,15 @@
   <div class="tab-content active" id="admin-tab">
     <div class="screen-body">
       <div class="date-display">2026年7月14日（月）</div>
-      <div class="worker-card">
+      <div class="worker-card" onclick="showScreen('screen-a03')" style="cursor:pointer">
         <div class="worker-name">田中太郎 <span class="status-dot green">●</span> 勤務中</div>
         <div class="worker-detail">フル出勤 → 現場A作業中</div>
       </div>
-      <div class="worker-card">
+      <div class="worker-card" onclick="showScreen('screen-a03')" style="cursor:pointer">
         <div class="worker-name">マリク <span class="status-dot green">●</span> 勤務中</div>
         <div class="worker-detail">フル出勤 → 現場B作業中</div>
       </div>
-      <div class="worker-card">
+      <div class="worker-card" onclick="showScreen('screen-a03')" style="cursor:pointer">
         <div class="worker-name">スミス <span class="status-dot gray">●</span> 未出勤</div>
         <div class="worker-detail"></div>
       </div>
@@ -254,7 +254,7 @@
         <button class="btn btn-outline" onclick="showScreen('screen-a02')">勤務実績</button>
         <button class="btn btn-outline" onclick="showScreen('screen-a04')">現場管理</button>
         <button class="btn btn-outline" onclick="showScreen('screen-a05')">割り振り</button>
-        <button class="btn btn-outline">アカウント</button>
+        <button class="btn btn-outline" onclick="showScreen('screen-a06')">アカウント</button>
       </div>
     </div>
   </div>
@@ -380,6 +380,97 @@
   </div>
 </div>
 
+<!-- ========== A-03: 作業員詳細 ========== -->
+<div class="screen" id="screen-a03">
+  <div class="screen-id">A-03: 作業員詳細画面</div>
+  <div class="header">
+    <button class="header-btn" onclick="showScreen('screen-a01')">← 戻る</button>
+    <span>作業員詳細</span>
+    <div></div>
+  </div>
+  <div class="screen-body">
+    <div class="worker-profile">
+      <div class="profile-name">田中太郎</div>
+      <div class="profile-meta">ID: worker001 ｜ ロール: 作業員 ｜ 言語: 日本語</div>
+    </div>
+
+    <div class="detail-section">
+      <div class="settings-title">■ 本日の打刻</div>
+      <div class="detail-row">出勤: フル出勤（08:00〜17:30）</div>
+      <div class="detail-row">現場A: 作業中（09:15〜）</div>
+    </div>
+
+    <div class="detail-section">
+      <div class="settings-title">■ 月間サマリー（7月）</div>
+      <table class="result-table">
+        <tr><th>出勤日数</th><th>フル</th><th>午前</th><th>午後</th></tr>
+        <tr><td>14日</td><td>12</td><td>1</td><td>1</td></tr>
+      </table>
+    </div>
+
+    <div class="detail-section">
+      <div class="settings-title">■ 直近の作業報告</div>
+      <div class="history-item">
+        <div class="history-date">7/14 現場A</div>
+        <div>担当: 台所, 浴室 ｜ 品質: A</div>
+      </div>
+      <div class="history-item">
+        <div class="history-date">7/11 現場B</div>
+        <div>担当: リビング, トイレ ｜ 品質: B</div>
+      </div>
+    </div>
+
+    <button class="btn btn-outline btn-block" onclick="showScreen('screen-a02')">全履歴を見る</button>
+    <button class="btn btn-outline btn-block">作業報告を見る</button>
+  </div>
+</div>
+
+<!-- ========== A-06: アカウント管理 ========== -->
+<div class="screen" id="screen-a06">
+  <div class="screen-id">A-06: アカウント管理画面</div>
+  <div class="header">
+    <button class="header-btn" onclick="showScreen('screen-a01')">← 戻る</button>
+    <span>アカウント管理</span>
+    <div></div>
+  </div>
+  <div class="screen-body">
+    <button class="btn btn-primary btn-block">＋ 新規アカウント作成</button>
+
+    <div class="account-card">
+      <div class="account-name">田中太郎</div>
+      <div class="account-meta">ID: worker001 ｜ ロール: 作業員 ｜ 言語: 日本語</div>
+      <div class="card-actions">
+        <button class="btn btn-sm btn-outline">編集</button>
+        <button class="btn btn-sm btn-outline">削除</button>
+      </div>
+    </div>
+    <div class="account-card">
+      <div class="account-name">マリク</div>
+      <div class="account-meta">ID: worker003 ｜ ロール: 作業員 ｜ 言語: シンハラ語</div>
+      <div class="card-actions">
+        <button class="btn btn-sm btn-outline">編集</button>
+        <button class="btn btn-sm btn-outline">削除</button>
+      </div>
+    </div>
+    <div class="account-card">
+      <div class="account-name">スミス</div>
+      <div class="account-meta">ID: worker005 ｜ ロール: 作業員 ｜ 言語: English</div>
+      <div class="card-actions">
+        <button class="btn btn-sm btn-outline">編集</button>
+        <button class="btn btn-sm btn-outline">削除</button>
+      </div>
+    </div>
+    <div class="account-card">
+      <div class="account-name">なおえ</div>
+      <div class="account-meta">ID: admin001 ｜ ロール: 管理者 ｜ 言語: 日本語</div>
+      <div class="card-actions">
+        <button class="btn btn-sm btn-outline">編集</button>
+        <button class="btn btn-sm btn-outline">削除</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ========== 画面一覧ナビ ========== -->
 <div id="screen-nav">
   <button onclick="showScreen('screen-login')">ログイン</button>
@@ -388,8 +479,10 @@
   <button onclick="showScreen('screen-w03')">W-03</button>
   <button onclick="showScreen('screen-a01')">A-01</button>
   <button onclick="showScreen('screen-a02')">A-02</button>
+  <button onclick="showScreen('screen-a03')">A-03</button>
   <button onclick="showScreen('screen-a04')">A-04</button>
   <button onclick="showScreen('screen-a05')">A-05</button>
+  <button onclick="showScreen('screen-a06')">A-06</button>
 </div>
 
 <script src="app.js"></script>
