@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>勤怠アプリ プロトタイプ（暫定版）</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- ========== 注意バナー ========== -->
+<div id="prototype-banner">⚠️ プロトタイプ（暫定版）— デザイン・レイアウトは未確定です</div>
+
+<!-- ========== S-01: ログイン ========== -->
+<div class="screen active" id="screen-login">
+  <div class="screen-id">S-01: ログイン画面</div>
+  <div class="screen-body login-body">
+    <div class="app-logo">🏢 勤怠アプリ</div>
+    <div class="form-group">
+      <label>ユーザーID</label>
+      <input type="text" placeholder="例: worker001" />
+    </div>
+    <div class="form-group">
+      <label>パスワード</label>
+      <input type="password" placeholder="パスワードを入力" />
+    </div>
+    <button class="btn btn-primary btn-block" onclick="showScreen('screen-w01')">ログイン（作業員）</button>
+    <button class="btn btn-secondary btn-block" onclick="showScreen('screen-a01')">ログイン（管理者）</button>
+    <div class="login-footer">
+      <a href="#" class="link-forgot" onclick="alert('❓ 先方確認事項（No.4）:\nパスワード忘れの対応方法\n\n案①: 作業員が自分でメールで再発行\n案②: 管理者がリセットして連絡')">パスワードを忘れた場合</a>
+    </div>
+  </div>
+</div>
+
+<!-- ========== W-01: 打刻画面 ========== -->
+<div class="screen" id="screen-w01">
+  <div class="screen-id">W-01: 打刻画面（ホーム）</div>
+  <div class="header">
+    <span>🏠 ホーム</span>
+    <div>
+      <button class="header-btn" onclick="showScreen('screen-w04')">履歴</button>
+      <button class="header-btn" onclick="showScreen('screen-w05')">設定</button>
+      <button class="header-btn" onclick="if(confirm('ログアウトしますか？')) showScreen('screen-login')">🚪</button>
+    </div>
+  </div>
+  <div class="screen-body">
+    <div class="clock" id="clock">--:--:--</div>
+    <div class="status-badge status-off">ステータス: 未出勤</div>
+
+    <!-- ❓ 先方確認事項: シフト選択式 -->
+    <div class="question-box" onclick="alert('❓ 先方確認事項（No.6）:\n\n現在の案: フル出勤/午前/午後の選択式\n→ リアルタイム打刻だと時給計算にズレが出る\n→ シフト選択式なら固定時間で計算可能\n\nこの方式で問題ないか確認が必要')">
+      <div class="question-label">❓ 確認事項: 打刻方式（No.6）</div>
+    </div>
+
+    <div class="shift-selector">
+      <div class="shift-label">出勤パターンを選択</div>
+      <button class="btn btn-shift" onclick="selectShift(this, 'full')">フル出勤<br><small>8:00〜17:30</small></button>
+      <button class="btn btn-shift" onclick="selectShift(this, 'am')">午前出勤<br><small>8:00〜12:00</small></button>
+      <button class="btn btn-shift" onclick="selectShift(this, 'pm')">午後出勤<br><small>13:00〜17:30</small></button>
+    </div>
+
+    <button class="btn btn-success btn-block" onclick="clockIn()">🟢 出勤</button>
+    <button class="btn btn-danger btn-block btn-disabled" id="btn-clockout">🔴 退勤</button>
+    <div class="site-buttons">
+      <button class="btn btn-outline btn-disabled" id="btn-site-start">現場開始</button>
+      <button class="btn btn-outline btn-disabled" id="btn-site-end">現場終了</button>
+    </div>
+
+    <div class="report-badge hidden" id="report-badge">
+      ⚠️ 未提出の報告: 1件
+      <button class="btn btn-sm" onclick="showScreen('screen-w03')">報告する</button>
+    </div>
+
+    <div class="daily-log">
+      <div class="log-title">今日の記録:</div>
+      <div class="log-entry" id="log-entries">（まだ打刻がありません）</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== W-02: 現場選択 ========== -->
+<div class="screen" id="screen-w02">
+  <div class="screen-id">W-02: 現場選択画面</div>
+  <div class="header">
+    <button class="header-btn" onclick="showScreen('screen-w01')">← 戻る</button>
+    <span>現場を選択</span>
+    <div></div>
+  </div>
+  <div class="screen-body">
+    <div class="question-box" onclick="alert('❓ 先方確認事項（No.8）:\n\n・事務所で現場選択してから移動？\n・日付と紐づけて一覧を出すか？\n・鍵の受け取り方法は？')">
+      <div class="question-label">❓ 確認事項: 現場選択の運用（No.8〜11）</div>
+    </div>
+
+    <div class="date-linked">📅 2026年7月14日（月）の割り振り</div>
+    <input type="text" class="search-box" placeholder="🔍 検索..." />
+
+    <div class="site-card highlighted">
+      <div class="site-name">📍 現場A <span class="highlight-tag">本日の割当</span></div>
+      <div class="site-address">東京都新宿区○○1-2-3</div>
+      <div class="site-note">🔑 鍵: 管理会社のポストから受取</div>
+      <button class="btn btn-primary btn-sm" onclick="showScreen('screen-w01')">この現場で開始</button>
+    </div>
+    <div class="site-card highlighted">
+      <div class="site-name">📍 現場C <span class="highlight-tag">本日の割当</span></div>
+      <div class="site-address">東京都渋谷区△△4-5-6</div>
+      <div class="site-note">🔑 鍵: 朝ミで受取済み</div>
+      <button class="btn btn-primary btn-sm" onclick="showScreen('screen-w01')">この現場で開始</button>
+    </div>
+    <div class="site-card">
+      <div class="site-name">📍 現場B</div>
+      <div class="site-address">東京都品川区○○7-8-9</div>
+      <button class="btn btn-outline btn-sm" onclick="showScreen('screen-w01')">選択</button>
+    </div>
+
+    <button class="btn btn-outline btn-block" onclick="alert('❓ 確認事項（No.9）:\n未登録の現場でもスキップして作業開始できるようにするか？'); showScreen('screen-w01')">
+      現場をスキップして作業開始
+    </button>
+  </div>
+</div>
+
+<!-- ========== W-03: 作業報告 ========== -->
+<div class="screen" id="screen-w03">
+  <div class="screen-id">W-03: 作業報告画面</div>
+  <div class="header">
+    <button class="header-btn" onclick="showScreen('screen-w01')">← 戻る</button>
+    <span>作業報告</span>
+    <div></div>
+  </div>
+  <div class="screen-body">
+    <div class="question-box" onclick="alert('❓ 確認事項:\n\nNo.12: 作業時間の表示は不要\nNo.13: 担当箇所は添付ファイルから\nNo.14: 担当箇所は管理者が拡張可能\nNo.15: 写真ごとのコメント機能')">
+      <div class="question-label">❓ 確認事項: 報告内容（No.12〜15）</div>
+    </div>
+
+    <div class="report-info">
+      <div><strong>現場:</strong> 現場A（自動入力）</div>
+      <div><strong>日付:</strong> 2026年7月14日</div>
+    </div>
+
+    <div class="form-group">
+      <label>担当箇所（指示書より）</label>
+      <div class="checklist">
+        <label class="check-item"><input type="checkbox"> 台所</label>
+        <label class="check-item"><input type="checkbox"> 浴室</label>
+        <label class="check-item"><input type="checkbox"> トイレ</label>
+        <label class="check-item"><input type="checkbox"> リビング</label>
+        <label class="check-item"><input type="checkbox"> 玄関・廊下</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>写真（1枚ごとにコメント可能）</label>
+      <div class="photo-list">
+        <div class="photo-item">
+          <div class="photo-placeholder">📷 写真1</div>
+          <input type="text" placeholder="コメント: 台所の清掃後" />
+        </div>
+        <div class="photo-item">
+          <div class="photo-placeholder">📷 写真2</div>
+          <input type="text" placeholder="コメント: 浴室の排水口" />
+        </div>
+        <button class="btn btn-outline btn-sm">＋ 写真を追加</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>備考（自由記入）</label>
+      <textarea placeholder="気になった点など"></textarea>
+    </div>
+
+    <button class="btn btn-primary btn-block" onclick="alert('報告を送信しました'); showScreen('screen-w01')">報告を送信</button>
+  </div>
+</div>
+
+<!-- ========== W-04: 勤務履歴 ========== -->
+<div class="screen" id="screen-w04">
+  <div class="screen-id">W-04: 勤務履歴画面</div>
+  <div class="header">
+    <button class="header-btn" onclick="showScreen('screen-w01')">← 戻る</button>
+    <span>勤務履歴</span>
+    <div></div>
+  </div>
+  <div class="screen-body">
+    <div class="month-nav">◀ 2026年7月 ▶</div>
+    <div class="history-item">
+      <div class="history-date">7/14（月）</div>
+      <div>フル出勤 ｜ 現場A, 現場C</div>
+    </div>
+    <div class="history-item">
+      <div class="history-date">7/11（金）</div>
+      <div>フル出勤 ｜ 現場B</div>
+    </div>
+    <div class="history-item">
+      <div class="history-date">7/10（木）</div>
+      <div>午前出勤 ｜ 現場A</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== W-05: 設定 ========== -->
+<div class="screen" id="screen-w05">
+  <div class="screen-id">W-05: 設定画面（作業員）</div>
+  <div class="header">
+    <button class="header-btn" onclick="showScreen('screen-w01')">← 戻る</button>
+    <span>設定</span>
+    <div></div>
+  </div>
+  <div class="screen-body">
+    <div class="settings-section">
+      <div class="settings-title">■ プロフィール</div>
+      <div class="settings-item">名前: マリク</div>
+      <div class="settings-item">ID: worker003</div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-title">■ 表示言語</div>
+      <label class="radio-item"><input type="radio" name="lang" checked> සිංහල（シンハラ語）</label>
+      <label class="radio-item"><input type="radio" name="lang"> English</label>
+      <label class="radio-item"><input type="radio" name="lang"> 日本語</label>
+    </div>
+    <div class="settings-section">
+      <button class="btn btn-outline btn-block">パスワードを変更</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== A-01: 管理ダッシュボード ========== -->
+<div class="screen" id="screen-a01">
+  <div class="screen-id">A-01: 管理ダッシュボード</div>
+  <div class="header">
+    <span>📊 管理画面</span>
+    <div>
+      <button class="header-btn" onclick="showScreen('screen-a07')">設定</button>
+      <button class="header-btn" onclick="if(confirm('ログアウトしますか？')) showScreen('screen-login')">🚪</button>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab active" onclick="switchTab(this, 'admin-tab')">管理</button>
+    <button class="tab" onclick="switchTab(this, 'self-clock-tab')">自分の打刻</button>
+  </div>
+  <div class="tab-content active" id="admin-tab">
+    <div class="screen-body">
+      <div class="date-display">2026年7月14日（月）</div>
+      <div class="worker-card">
+        <div class="worker-name">田中太郎 <span class="status-dot green">●</span> 勤務中</div>
+        <div class="worker-detail">フル出勤 → 現場A作業中</div>
+      </div>
+      <div class="worker-card">
+        <div class="worker-name">マリク <span class="status-dot green">●</span> 勤務中</div>
+        <div class="worker-detail">フル出勤 → 現場B作業中</div>
+      </div>
+      <div class="worker-card">
+        <div class="worker-name">スミス <span class="status-dot gray">●</span> 未出勤</div>
+        <div class="worker-detail"></div>
+      </div>
+      <div class="admin-menu">
+        <button class="btn btn-outline" onclick="showScreen('screen-a02')">勤務実績</button>
+        <button class="btn btn-outline" onclick="showScreen('screen-a04')">現場管理</button>
+        <button class="btn btn-outline" onclick="showScreen('screen-a05')">割り振り</button>
+        <button class="btn btn-outline">アカウント</button>
+      </div>
+    </div>
+  </div>
+  <div class="tab-content" id="self-clock-tab">
+    <div class="screen-body">
+      <div class="clock" id="clock2">--:--:--</div>
+      <div class="status-badge status-off">ステータス: 未出勤</div>
+      <div class="shift-selector">
+        <button class="btn btn-shift">フル出勤<br><small>8:00〜17:30</small></button>
+        <button class="btn btn-shift">午前出勤<br><small>8:00〜12:00</small></button>
+        <button class="btn btn-shift">午後出勤<br><small>13:00〜17:30</small></button>
+      </div>
+      <button class="btn btn-success btn-block">🟢 出勤</button>
+      <button class="btn btn-danger btn-block btn-disabled">🔴 退勤</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== A-02: 勤務実績 ========== -->
+<div class="screen" id="screen-a02">
+  <div class="screen-id">A-02: 勤務実績画面</div>
+  <div class="header">
+    <button class="header-btn" onclick="showScreen('screen-a01')">← 戻る</button>
+    <span>勤務実績</span>
+    <div></div>
+  </div>
+  <div class="screen-body">
+    <div class="question-box" onclick="alert('❓ 確認事項（No.17）:\n日/週/月の切替 → 月のみで良いのでは？')">
+      <div class="question-label">❓ 月表示のみに変更（No.17）</div>
+    </div>
+    <div class="month-nav">◀ 2026年7月 ▶</div>
+    <table class="result-table">
+      <thead><tr><th>名前</th><th>出勤日数</th><th>フル</th><th>午前</th><th>午後</th></tr></thead>
+      <tbody>
+        <tr><td>田中太郎</td><td>20日</td><td>18</td><td>1</td><td>1</td></tr>
+        <tr><td>マリク</td><td>22日</td><td>22</td><td>0</td><td>0</td></tr>
+        <tr><td>スミス</td><td>18日</td><td>15</td><td>2</td><td>1</td></tr>
+      </tbody>
+    </table>
+    <button class="btn btn-outline btn-block">CSVエクスポート</button>
+  </div>
+</div>
+
+<!-- ========== A-04: 現場管理 ========== -->
+<div class="screen" id="screen-a04">
+  <div class="screen-id">A-04: 現場管理画面</div>
+  <div class="header">
+    <button class="header-btn" onclick="showScreen('screen-a01')">← 戻る</button>
+    <span>現場管理</span>
+    <div></div>
+  </div>
+  <div class="screen-body">
+    <div class="question-box" onclick="alert('❓ 確認事項（No.18）:\nカレンダー機能が必要。日付×現場の紐づけ管理。')">
+      <div class="question-label">❓ カレンダー機能の追加（No.18）</div>
+    </div>
+    <input type="text" class="search-box" placeholder="🔍 検索..." />
+    <button class="btn btn-primary btn-sm">＋ 新規登録</button>
+    <div class="site-card">
+      <div class="site-name">📍 現場A</div>
+      <div class="site-address">東京都新宿区○○1-2-3</div>
+      <div class="site-meta">依頼元: ○○不動産 ｜ 難易度: ★★☆</div>
+      <div class="site-note">🔑 鍵: 管理会社のポストから受取</div>
+      <div class="card-actions"><button class="btn btn-sm btn-outline">編集</button> <button class="btn btn-sm btn-outline">削除</button></div>
+    </div>
+    <div class="site-card">
+      <div class="site-name">📍 現場B</div>
+      <div class="site-address">東京都品川区○○7-8-9</div>
+      <div class="site-meta">依頼元: △△ハウス ｜ 難易度: ★★★</div>
+      <div class="site-note">🔑 鍵: 朝ミで配布</div>
+      <div class="card-actions"><button class="btn btn-sm btn-outline">編集</button> <button class="btn btn-sm btn-outline">削除</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== A-05: 割り振り ========== -->
+<div class="screen" id="screen-a05">
+  <div class="screen-id">A-05: 割り振り画面</div>
+  <div class="header">
+    <button class="header-btn" onclick="showScreen('screen-a01')">← 戻る</button>
+    <span>割り振り</span>
+    <div></div>
+  </div>
+  <div class="screen-body">
+    <div class="question-box" onclick="alert('❓ 確認事項（No.19）:\nここで割り振った内容をW-02でハイライト表示、\nW-03の現場を自動入力するか？')">
+      <div class="question-label">❓ W-02/W-03との連動（No.19）</div>
+    </div>
+    <div class="month-nav">◀ 2026年7月14日（月） ▶</div>
+    <div class="site-card">
+      <div class="site-name">📍 現場A 09:00〜</div>
+      <div>担当: 田中, マリク</div>
+      <button class="btn btn-sm btn-outline" onclick="alert('チェックボックスで作業員を選択するモーダルが表示されます')">担当を編集</button>
+    </div>
+    <div class="site-card">
+      <div class="site-name">📍 現場C 10:00〜</div>
+      <div>担当: （未割当）</div>
+      <button class="btn btn-sm btn-outline">担当を編集</button>
+    </div>
+    <button class="btn btn-primary btn-block">保存して通知</button>
+  </div>
+</div>
+
+<!-- ========== A-07: 設定（管理者） ========== -->
+<div class="screen" id="screen-a07">
+  <div class="screen-id">A-07: 設定画面（管理者）</div>
+  <div class="header">
+    <button class="header-btn" onclick="showScreen('screen-a01')">← 戻る</button>
+    <span>設定</span>
+    <div></div>
+  </div>
+  <div class="screen-body">
+    <div class="settings-section">
+      <div class="settings-title">■ GPS設定</div>
+      <label class="toggle-item"><input type="checkbox" checked> GPS記録を有効にする</label>
+    </div>
+    <div class="settings-section">
+      <div class="settings-title">■ 自動翻訳</div>
+      <label class="toggle-item"><input type="checkbox" checked> 自動翻訳を有効にする</label>
+    </div>
+    <div class="settings-section">
+      <button class="btn btn-outline btn-block">パスワードを変更</button>
+      <button class="btn btn-outline btn-block">データエクスポート</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 画面一覧ナビ ========== -->
+<div id="screen-nav">
+  <button onclick="showScreen('screen-login')">ログイン</button>
+  <button onclick="showScreen('screen-w01')">W-01</button>
+  <button onclick="showScreen('screen-w02')">W-02</button>
+  <button onclick="showScreen('screen-w03')">W-03</button>
+  <button onclick="showScreen('screen-a01')">A-01</button>
+  <button onclick="showScreen('screen-a02')">A-02</button>
+  <button onclick="showScreen('screen-a04')">A-04</button>
+  <button onclick="showScreen('screen-a05')">A-05</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
