@@ -1,6 +1,8 @@
 # CSVエクスポート仕様
 
 > 勤務実績画面（A-02）の [CSVエクスポート] で出力するファイルの仕様。
+>
+> **更新履歴**: 2026-07-15 MTG結果を反映。評価ランク・評価備考列を追加。
 
 ---
 
@@ -35,8 +37,9 @@
 | 7 | 総勤務h | number | 退勤 - 出勤 | 小数（例: 8.5） |
 | 8 | 休憩h | number | ⏸️ 保留 | 小数（例: 1.0） |
 | 9 | 実労働h | number | 総勤務 - 休憩 | 小数（例: 7.5） |
-| 10 | 現場数 | number | SiteStartの回数 | 整数 |
-| 11 | 移動h | number | 現場間の空き時間合計 | 小数 |
+| 10 | 確定勤務h | number | DailyRecord.confirmedHours | 管理者が確定した勤務時間。給与計算に使用 |
+| 11 | 現場数 | number | SiteStartの回数 | 整数 |
+| 12 | 移動h | number | 現場間の空き時間合計 | 小数 |
 
 ### 出力例
 
@@ -73,9 +76,10 @@
 | 5 | 清掃難易度 | string | Site.difficulty | ★☆☆ / ★★☆ / ★★★ |
 | 6 | 作業h | number | SiteEnd - SiteStart | 小数 |
 | 7 | 担当箇所 | string | WorkReport.areas | セミコロン区切り |
-| 8 | 清掃品質 | string | WorkReport.quality | A / B / C |
-| 9 | 備考（翻訳） | string | WorkReport.notes.translated | 日本語訳 |
-| 10 | 備考（原文） | string | WorkReport.notes.original | 入力言語のまま |
+| 8 | 評価ランク | string | WorkReport.evaluationRank | A / B / C |
+| 9 | 評価備考 | string | WorkReport.evaluationNote | ランクの理由 |
+| 10 | 備考（翻訳） | string | WorkReport.notes.translated | 日本語訳 |
+| 11 | 備考（原文） | string | WorkReport.notes.original | 入力言語のまま |
 
 ### 出力例
 
@@ -96,4 +100,6 @@
 | 出勤・退勤時刻 | HH:MM形式のまま。給与計算には直接使わないが参照用に残す |
 | 欠勤日 | 出力しない（出勤データがある日のみ行を出力） |
 | 休憩時間 | ⏸️ 保留事項の解決後に仕様を確定する |
+| 確定勤務時間 | 管理者が確定した勤務時間。給与計算にはconfirmedHoursを使用（2026-07-15 MTG） |
 | 並び順 | 作業員名 → 日付 の昇順 |
+| 評価ランク | 管理者が物件単位で付与。評価備考とセットで出力（2026-07-15 MTG） |
